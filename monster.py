@@ -2,7 +2,7 @@
 class Monster(object):
     positions = []
 
-    def __init__(self, board, color, position, canvas, jump_patterns=[], rest=False, sick=False):
+    def __init__(self, board, color, position, jump_patterns=[], canvas=None, rest=False, sick=False):
         self.board = board
         self.color = color
         self.positions = [position]
@@ -12,8 +12,11 @@ class Monster(object):
         self.rest = rest
         self.sick = sick
         self.life = 5
+        self.collection = ''
 
-        self._draw2()
+        #print('start position {}: {}'.format(self.color, self.positions[0]))
+
+        #self._draw2()
 
     def add_jump_pattern(self, pattern):
         self.jump_patterns.append(pattern)
@@ -38,15 +41,32 @@ class Monster(object):
                 hit_border += 'w'
             if last_x + x >= len(self.board[0]):
                 hit_border += 'e'
-
-            self._draw2()
+        else:
+            self.positions.append((new_x, new_y))
+        #self._draw2()
         self.jump_num += 1
         #self.rest = False
         if self.sick:
             self.life -= 1
         return new_x, new_y
 
-    def get_position(self):
+    def jump(self):
+        last_x, last_y = self.positions[-1]
+        x, y = self.jump_patterns[self.jump_num % len(self.jump_patterns) - 1]
+        new_x = (last_x + x) % len(self.board[0])
+        new_y = (last_y + y) % len(self.board)
+        self.positions.append((new_x, new_y))
+        self.jump_num += 1
+
+        return new_x, new_y
+
+    def stay(self):
+        self.positions.append(self.positions[-1])
+        self.jump_num += 1
+        return self.positions[-1]
+
+    @property
+    def position(self):
         return self.positions[-1]
 
     def _draw(self, hit_border):
@@ -63,7 +83,7 @@ class Monster(object):
         space = int(self.canvas['width']) / (len(self.board) + 2)
 
         x1, y1 = self.positions[-1]
-        r = 5
+        r = self.r
         self.canvas.create_oval((1.5 + x1) * space - r, (1.5 + y1) * space - r,
                                 (1.5 + x1) * space + r, (1.5 + y1) * space + r,
-                                fill=self.color, width=0)
+                                outline=self.color, width=2)
