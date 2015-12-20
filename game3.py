@@ -84,12 +84,12 @@ alpha = [(0, 3, 'I'), (0, 12, 'U'), (0, 20, 'H'),
         ]
 
 
-class Game4(App):
+class Game3(App):
     def __init__(self, tk_root, monsters_initdata, board_dim, board_signs):
-        super(Game4, self).__init__(tk_root, monsters_initdata, board_dim, board_signs)
+        super(Game3, self).__init__(tk_root, monsters_initdata, board_dim, board_signs)
 
 
 #create view
 root = Tk()
-app = Game4(root, data, (21,21), alpha)
+app = Game3(root, data, (21,21), alpha)
 root.mainloop()
