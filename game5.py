@@ -1,5 +1,4 @@
-from itertools import combinations
-from Tkinter import Tk, Canvas, mainloop, Frame, Button, LEFT, Label, StringVar
+from Tkinter import Tk, Canvas, Frame, Button, LEFT, Label, StringVar
 from monster import Monster
 import tkFont
 
@@ -49,34 +48,6 @@ blue_patterns = [(-2,2), (0,-2), (1,0)]
 yellow_patterns = [(0,-2), (1,2), (1,-3)]
 pink_patterns = [(1,1), (1,0), (1,-1)]
 brown_patterns = [(-1,1), (0,-2), (-1,-1)]
-
-start_positions_reds = [(1, 0), (1, 18), (2, 19), (3, 10), (4, 5),
-                        (6, 5), (6, 7), (7, 18), (8, 14),
-                        (10, 1), (10, 6), (10, 15), (12, 18),
-                        (15, 1), (15, 16), (17, 5), (19, 0), (19, 3)]
-
-start_positions_greens = [(0, 13), (1, 5), (2, 7), (2, 10), (3, 7), (4, 2), (4, 12),
-                          (8, 12), (9, 16),
-                          (10, 10), (11, 10), (13, 16), (14, 18), (15, 17), (15, 20),
-                          (17, 1), (18, 11), (20, 2)]
-
-start_positions_blues = [(0, 5), (1, 13), (2, 4), (2, 14), (4, 13),
-                         (6, 9),
-                         (10, 14), (12, 17), (14, 16),
-                         (16, 12), (19, 5), (19, 14), (19, 15)]
-
-start_positions_yellows = [(0, 2), (1, 4), (4, 11),
-                           (5, 18), (8, 9), (8, 20), (9, 5),
-                           (12, 11), (14, 9),
-                           (18, 2)]
-
-start_positions_pinks = [(5, 14), (7, 10), (9, 15), (9, 19),
-                         (10, 2), (11, 0), (11, 9), (11, 11), (14, 13),
-                         (16, 0)]
-
-start_positions_browns = [(5, 13), (6, 0),
-                          (10, 16), (11, 1), (11, 2), (11, 17),
-                          (15, 2), (16, 16), (18, 17), (20, 15)]
 
 
 numbers = [(0, 11, '='),
@@ -210,6 +181,7 @@ class App:
             else:
                 track_positions[(x, y)] = [m]
 
+        babies = []
         for position, monsters in track_positions.iteritems():
             # meeting happened
             if len(monsters) > 1:
@@ -218,12 +190,30 @@ class App:
                     self.meet_counter += 1
 
                     # check if fuck
-                    self.fuck(monsters[0], monsters[1])
+                    baby = self.fuck(monsters[0], monsters[1])
+                    if baby:
+                        babies.append(baby)
                 else:
                     print "Rest @ {}: {}".format(position, [mon.color for mon in monsters])
 
+                # rest_in_group = [mon.rest for mon in monsters]
+                # if False in rest_in_group:
+                #     for mon in monsters:
+                #         if mon.rest:
+                #             mon.rest = False
+
                 for mon in monsters:
                     mon.rest = not mon.rest
+
+        for b in babies:
+            monsters_spot = track_positions.get(b.position)
+            if monsters_spot:
+                for mon in monsters_spot:
+                    mon.rest = True
+                    b.rest = True
+                    baby = self.fuck(b, mon)
+                    if baby:
+                        print "BABY AGAIN"
 
         print(self.collect)
         print
@@ -240,6 +230,7 @@ class App:
             if x == x_f and y == y_f:
                 monster.collection += value
                 print '{} > {} -- {}'.format(monster.color, monster.collection, monster.positions)
+                fields.remove((x_f, y_f, value))
                 return value
         return ''
 
@@ -290,6 +281,8 @@ class App:
             item = self.check_fields(baby, numbers)
             if item:
                 self.collect[baby.color].append(item)
+
+            return baby
 
 
 #create view
