@@ -114,6 +114,7 @@ class App(object):
         print('Meet counter: {}'.format(self.meet_counter))
         self.text_counter.set(str(self.jump_counter))
 
+
     def check_fields(self, monster, fields):
         x, y = monster.position
         for x_f, y_f, value in fields:
